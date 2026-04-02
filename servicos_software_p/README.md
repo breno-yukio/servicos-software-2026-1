@@ -30,3 +30,11 @@ Dentro do container api-visão, iremos criar os seguintes arquivos:
 - main.py
 - requirements.txt
 
+Utilizar o código disponível em servicos_software_p/api-visao como modelos destes arquivos.
+
+**API ARMAZENAMENTO**
+
+- Dockerfile
+- main.py
+- requirements.txt
+
