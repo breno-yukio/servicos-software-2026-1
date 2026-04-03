@@ -38,3 +38,43 @@ Utilizar o código disponível em servicos_software_p/api-visao como modelos des
 - main.py
 - requirements.txt
 
+**Alteração no arquivo compose.yaml para habilitar os novos containers**
+
+Devem ser acrescentadas as seguintes linhas no arquivo: 
+
+```xml
+  gradio-visao:
+    build:
+      context: gradio-visao
+      dockerfile: Dockerfile
+    ports:
+      - "7861:7861"
+    depends_on:
+      - api-visao
+
+  api-visao:
+    build:
+      context: api-visao
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - api-armazenamento
+
+api-armazenamento:
+  build:
+    context: api-armazenamento
+    dockerfile: Dockerfile
+  ports:
+    - "8082:8082"
+  volumes:
+    - dados-imagens:/dados
+
+volumes:
+  dados-imagens:
+
+```
+
+```sh
+docker compose up -d --build
+
