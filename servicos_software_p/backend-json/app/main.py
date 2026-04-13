@@ -1,17 +1,17 @@
 import os
 import shutil
-import whisper
-from typing import Optional, Union
-from fastapi import FastAPI
-from fastapi import File, UploadFile
+import tempfile
+from pathlib import Path
 
-import json
-from pydantic import BaseModel
+import whisper
+from fastapi import FastAPI, File, HTTPException, UploadFile
+
+WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "base")
 
 app = FastAPI()
 
-print("Carregando modelo de IA (Whisper)...")
-model = whisper.load_model("base")
+print(f"Carregando modelo de IA (Whisper: {WHISPER_MODEL})...")
+model = whisper.load_model(WHISPER_MODEL)
 print("Modelo carregado!")
 
 
@@ -22,14 +22,22 @@ def diz_ola():
 
 @app.post("/transcrever")
 async def transcrever_audio(file: UploadFile = File(...)):
-    caminho_temp = f"temp_{file.filename}"
-    with open(caminho_temp, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    nome = file.filename or "audio.wav"
+    sufixo = Path(nome).suffix or ".wav"
+    caminho_temp = None
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=sufixo) as tmp:
+            caminho_temp = tmp.name
+            shutil.copyfileobj(file.file, tmp)
+    except OSError as e:
+        raise HTTPException(status_code=500, detail=f"Falha ao salvar áudio: {e}") from e
 
     try:
         resultado = model.transcribe(caminho_temp, language="pt")
-        texto = resultado["text"].strip()
+        texto = (resultado.get("text") or "").strip()
+        return {"texto": texto}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro na transcrição: {e}") from e
     finally:
-        if os.path.exists(caminho_temp):
+        if caminho_temp and os.path.exists(caminho_temp):
             os.remove(caminho_temp)
-    return {"texto": texto}

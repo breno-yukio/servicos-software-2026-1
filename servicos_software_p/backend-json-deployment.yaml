@@ -23,6 +23,9 @@ spec:
       containers:
         - image: mamazzei/backend-json
           name: backend-json
+          env:
+            - name: WHISPER_MODEL
+              value: base
           ports:
             - containerPort: 8080
               protocol: TCP

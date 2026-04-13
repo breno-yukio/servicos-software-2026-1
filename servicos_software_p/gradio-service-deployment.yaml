@@ -23,6 +23,11 @@ spec:
       containers:
         - image: mamazzei/gradio-json
           name: gradio-service
+          env:
+            - name: BACKEND_URL
+              value: http://backend-json:8080
+            - name: TRANSCRICAO_TIMEOUT
+              value: "600"
           ports:
             - containerPort: 7860
               protocol: TCP
