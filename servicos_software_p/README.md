@@ -1,19 +1,47 @@
-# Áudio → texto (Gradio + FastAPI + Whisper)
+# Sistema de Transcrição de Áudio com API REST
 
-Manda um áudio (grava ou faz upload) e recebe o texto em português. Dá pra usar como base de prompt pra IA.
+## Visão do Projeto
+Este projeto consiste em uma aplicação distribuída utilizando *frontend e backend em containers Docker*, que permite a transcrição de áudio para texto.
 
-**Front (7860):** Gradio — só a interface. Ele manda o arquivo pro back com `requests` (`POST` em `/transcrever`).  
-**Back (8080):** FastAPI + Whisper — aqui roda a transcrição e volta `{"texto": "..."}`.
+O sistema utiliza uma arquitetura baseada em *API REST*, onde o frontend envia um arquivo de áudio para o backend, que realiza o processamento e retorna o texto transcrito.
 
-**APIs do back:** `GET /` (só pra ver se subiu, o Gradio não usa) e **`POST /transcrever`** (a rota que o front chama; áudio no campo `file`). Separamos assim porque o back fica testável e reutilizável sem carregar modelo na mesma app da UI.
+---
 
-## Rodar
+## Arquitetura
 
-```sh
-docker compose up -d --build
-```
+O sistema é composto por dois serviços principais:
 
-- App: http://localhost:7860  
-- API: http://localhost:8080 · doc rápida: http://localhost:8080/docs  
+- *Frontend:* Interface web desenvolvida com Gradio
+- *Backend:* API REST desenvolvida com FastAPI
+- *Modelo:* Whisper (transcrição de áudio)
 
-**Env úteis:** `WHISPER_MODEL` (back), `BACKEND_URL` e `TRANSCRICAO_TIMEOUT` (front).
+---
+
+## Fluxo do Sistema
+
+1. O usuário acessa a interface web (Gradio)
+2. Envia ou grava um áudio
+3. O frontend envia o arquivo para o backend via HTTP
+4. O backend processa o áudio utilizando o modelo Whisper
+5. O backend retorna a transcrição em JSON
+6. O frontend exibe o resultado na tela
+
+---
+
+## Tecnologias Utilizadas
+
+- Python
+- FastAPI
+- Gradio
+- Whisper
+- Docker
+- Docker Compose
+
+---
+
+## 🚀 Como Executar (Docker Compose)
+
+Na pasta do projeto, execute:
+
+```bash
+docker compose up --build
