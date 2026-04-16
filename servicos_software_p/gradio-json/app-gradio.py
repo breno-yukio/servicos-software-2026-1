@@ -4,8 +4,6 @@ from pathlib import Path
 import gradio as gr
 import requests
 
-# Na rede do Docker Compose: http://backend-json:8080
-# Rodando o Gradio no host: BACKEND_URL=http://127.0.0.1:8080
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://backend-json:8080").rstrip("/")
 TRANSCRICAO_TIMEOUT = int(os.environ.get("TRANSCRICAO_TIMEOUT", "600"))
 

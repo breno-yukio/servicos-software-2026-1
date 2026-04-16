@@ -4,7 +4,6 @@ WORKDIR /code
 
 ENV WHISPER_MODEL=base
 
-# Atualização necessária: Instalar o ffmpeg para o processamento do áudio
 RUN apt-get update && apt-get install -y ffmpeg
 
 COPY ./requirements.txt /code/requirements.txt

@@ -1,7 +1,7 @@
 # Frontend Gradio + backend FastAPI (Whisper)
 services:
   gradio-service:
-    image: mamazzei/gradio-json
+    image: breno-yukio/frontend-json
     build:
       context: gradio-json
       dockerfile: Dockerfile
@@ -14,7 +14,7 @@ services:
       - backend-json
 
   backend-json:
-    image: mamazzei/backend-json
+    image: breno-yukio/backend-json
     build:
       context: backend-json
       dockerfile: Dockerfile

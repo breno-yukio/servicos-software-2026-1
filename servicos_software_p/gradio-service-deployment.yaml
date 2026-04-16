@@ -21,7 +21,7 @@ spec:
         io.kompose.service: gradio-service
     spec:
       containers:
-        - image: mamazzei/gradio-json
+        - image: breno-yukio/frontend-json
           name: gradio-service
           env:
             - name: BACKEND_URL

@@ -21,7 +21,7 @@ spec:
         io.kompose.service: backend-json
     spec:
       containers:
-        - image: mamazzei/backend-json
+        - image: breno-yukio/backend-json
           name: backend-json
           env:
             - name: WHISPER_MODEL
