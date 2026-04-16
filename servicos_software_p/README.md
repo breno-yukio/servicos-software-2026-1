@@ -39,7 +39,7 @@ O sistema é composto por dois serviços principais:
 
 ---
 
-## 🚀 Como Executar (Docker Compose)
+## Como Executar (Docker Compose)
 
 Na pasta do projeto, execute:
 
