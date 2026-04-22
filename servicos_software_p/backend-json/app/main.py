@@ -1,43 +1,68 @@
-import os
-import shutil
-import tempfile
-from pathlib import Path
+"""FastAPI: geração de plano e healthcheck."""
 
-import whisper
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "base")
+from .models import GerarPlanoRequest
+from .planner import gerar_plano
 
-app = FastAPI()
+app = FastAPI(
+    title="Planejador de Rotina de Estudos",
+    version="1.0.0",
+    description="API para gerar planos de estudo personalizados com base em disponibilidade, "
+    "matérias e compromissos.",
+)
 
-print(f"Carregando modelo de IA (Whisper: {WHISPER_MODEL})...")
-model = whisper.load_model(WHISPER_MODEL)
-print("Modelo carregado!")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    """Converte erros de validação Pydantic em mensagens mais legíveis."""
+    erros = []
+    for err in exc.errors():
+        loc = " → ".join(str(x) for x in err.get("loc", []))
+        msg = err.get("msg", "valor inválido")
+        erros.append(f"{loc}: {msg}")
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "erro": "Os dados enviados não puderam ser validados.",
+            "detalhes": erros,
+        },
+    )
 
 
 @app.get("/")
-def diz_ola():
-    return {"Olá": "Mundo"}
+def root():
+    """Identificação rápida do serviço (útil em testes e probes genéricos)."""
+    return {
+        "servico": "planejador-backend",
+        "docs": "/docs",
+        "health": "/health",
+    }
 
 
-@app.post("/transcrever")
-async def transcrever_audio(file: UploadFile = File(...)):
-    nome = file.filename or "audio.wav"
-    sufixo = Path(nome).suffix or ".wav"
-    caminho_temp = None
-    try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=sufixo) as tmp:
-            caminho_temp = tmp.name
-            shutil.copyfileobj(file.file, tmp)
-    except OSError as e:
-        raise HTTPException(status_code=500, detail=f"Falha ao salvar áudio: {e}") from e
+@app.get("/health")
+def health():
+    """Verificação simples de disponibilidade do serviço."""
+    return {"status": "ok"}
 
-    try:
-        resultado = model.transcribe(caminho_temp, language="pt")
-        texto = (resultado.get("text") or "").strip()
-        return {"texto": texto}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro na transcrição: {e}") from e
-    finally:
-        if caminho_temp and os.path.exists(caminho_temp):
-            os.remove(caminho_temp)
+
+@app.post("/gerar-plano")
+def gerar_plano_endpoint(payload: GerarPlanoRequest):
+    """
+    Recebe preferências do aluno e retorna um cronograma dia a dia com blocos
+    de teoria, exercícios e intervalos (definidos automaticamente) com horários reais.
+    """
+    return gerar_plano(payload)

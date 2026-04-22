@@ -9,8 +9,9 @@ metadata:
   name: gradio-service
 spec:
   ports:
+    # Porta 7860 mantida por compatibilidade; o container Nginx escuta na 80.
     - name: "7860"
       port: 7860
-      targetPort: 7860
+      targetPort: 80
   selector:
     io.kompose.service: gradio-service

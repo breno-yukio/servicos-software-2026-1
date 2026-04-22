@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planejador de Rotina de Estudos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <h1>Planejador de Rotina de Estudos</h1>
+      <p class="hero__subtitle">
+        Montaremos uma rotina de estudos de acordo com sua disponibilidade, matérias e compromissos.
+        Preencha com todas as informações que puder para melhor planejamento.
+      </p>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card" aria-labelledby="form-title">
+      <h2 id="form-title">Seus dados</h2>
+      <form id="plano-form" novalidate>
+        <div class="grid grid--2">
+          <label class="field">
+            <span>Dias de estudo</span>
+            <input type="number" name="dias_estudo" min="1" max="365" value="5" required />
+          </label>
+          <label class="field">
+            <span>Horas por dia</span>
+            <input type="number" name="horas_por_dia" min="0.5" max="24" step="0.5" value="3" required />
+          </label>
+        </div>
+
+        <div class="grid grid--2">
+          <label class="field">
+            <span>Objetivo</span>
+            <select name="objetivo" required>
+              <option value="prova">Prova</option>
+              <option value="revisao">Revisão</option>
+              <option value="trabalho">Trabalho</option>
+              <option value="aprendizado">Aprendizado</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Período preferido</span>
+            <select name="periodo_preferido" required>
+              <option value="manha">Manhã (08:00–12:00)</option>
+              <option value="tarde">Tarde (13:00–18:00)</option>
+              <option value="noite">Noite (19:00–22:30)</option>
+            </select>
+          </label>
+        </div>
+
+        <fieldset class="fieldset">
+          <legend>Matérias</legend>
+          <p class="hint">
+            Inclua cada matéria que você estuda e o nível de dificuldade correspondente. Assim, o plano
+            pode priorizar o conteúdo em que você tem mais dificuldade.
+          </p>
+          <div id="materias-list"></div>
+          <button type="button" class="btn btn--ghost" id="add-materia">+ Adicionar matéria</button>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Compromissos</legend>
+          <p class="hint">
+            Informe os horários em que você não pode estudar, de acordo com o período do dia selecionado
+            acima (manhã, tarde ou noite) e com o número do dia no plano.
+          </p>
+          <div id="compromissos-list"></div>
+          <button type="button" class="btn btn--ghost" id="add-compromisso">+ Adicionar compromisso</button>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="btn btn--primary" id="submit-btn">Gerar plano</button>
+          <span class="status" id="status-text" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+    </section>
+
+    <section class="card card--result" id="result-section" hidden aria-live="polite">
+      <h2>Plano sugerido</h2>
+      <p class="hint" id="edit-hint" hidden>
+        Ajuste horários, tipo ou matéria nos campos abaixo. Use <strong>Restaurar</strong> para voltar
+        ao plano gerado pela API.
+      </p>
+      <div class="toolbar" id="result-toolbar" hidden>
+        <button type="button" class="btn btn--ghost" id="btn-reset-plano">Restaurar plano original</button>
+        <button type="button" class="btn btn--ghost" id="btn-atualizar-totais">Atualizar totais</button>
+      </div>
+      <div id="result-summary" class="summary"></div>
+      <datalist id="lista-materias"></datalist>
+      <div id="result-dias" class="dias"></div>
+      <div id="result-obs" class="observacoes"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      Interface em Nginx (porta publicada no Compose, ex.: 7860) · API em <code>/api</code> →
+      <code>backend-json:8080</code> na rede Docker.
+    </p>
+  </footer>
+
+  <template id="tpl-materia">
+    <div class="row materia-row">
+      <label class="field field--grow">
+        <span>Nome</span>
+        <input type="text" class="m-nome" placeholder="Ex.: Cálculo I" required />
+      </label>
+      <label class="field">
+        <span>Dificuldade</span>
+        <select class="m-dificuldade">
+          <option value="baixa">Baixa</option>
+          <option value="media" selected>Média</option>
+          <option value="alta">Alta</option>
+        </select>
+      </label>
+      <button type="button" class="btn btn--danger btn--icon rm-materia" title="Remover">✕</button>
+    </div>
+  </template>
+
+  <template id="tpl-compromisso">
+    <div class="row compromisso-row">
+      <label class="field">
+        <span>Dia</span>
+        <input type="number" class="c-dia" min="1" value="1" required />
+      </label>
+      <label class="field">
+        <span>Início</span>
+        <input type="time" class="c-inicio" required />
+      </label>
+      <label class="field">
+        <span>Fim</span>
+        <input type="time" class="c-fim" required />
+      </label>
+      <button type="button" class="btn btn--danger btn--icon rm-compromisso" title="Remover">✕</button>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

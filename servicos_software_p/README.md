@@ -1,47 +1,31 @@
-# Sistema de Transcrição de Áudio com API REST
+# Planejador de rotina de estudos
 
-## Visão do Projeto
-Este projeto consiste em uma aplicação distribuída utilizando *frontend e backend em containers Docker*, que permite a transcrição de áudio para texto.
+Aplicação com **frontend** (Nginx + HTML/CSS/JS na pasta `gradio-json`) e **backend** (FastAPI na pasta `backend-json`), usando Docker Compose. Os manifests Kubernetes (`*-deployment.yaml`, `*-service.yaml`) correspondem a esses serviços.
 
-O sistema utiliza uma arquitetura baseada em *API REST*, onde o frontend envia um arquivo de áudio para o backend, que realiza o processamento e retorna o texto transcrito.
+## Serviços (Compose)
 
----
+| Serviço Compose | Pasta | Função |
+|-----------------|-------|--------|
+| `gradio-service` | `gradio-json/` | Página estática + proxy `/api` → backend |
+| `backend-json` | `backend-json/` | API `/gerar-plano`, `/health`, `/docs` |
 
-## Arquitetura
+## Subir localmente
 
-O sistema é composto por dois serviços principais:
-
-- *Frontend:* Interface web desenvolvida com Gradio
-- *Backend:* API REST desenvolvida com FastAPI
-- *Modelo:* Whisper (transcrição de áudio)
-
----
-
-## Fluxo do Sistema
-
-1. O usuário acessa a interface web (Gradio)
-2. Envia ou grava um áudio
-3. O frontend envia o arquivo para o backend via HTTP
-4. O backend processa o áudio utilizando o modelo Whisper
-5. O backend retorna a transcrição em JSON
-6. O frontend exibe o resultado na tela
-
----
-
-## Tecnologias Utilizadas
-
-- Python
-- FastAPI
-- Gradio
-- Whisper
-- Docker
-- Docker Compose
-
----
-
-## Como Executar (Docker Compose)
-
-Na pasta do projeto, execute:
+Na pasta `servicos_software_p`:
 
 ```bash
-docker compose up --build
+docker compose up --build -d
+```
+
+- **Interface:** http://localhost:7860 (mapeamento `7860:80`; altere em `compose.yaml` se a porta estiver ocupada)
+- **API direta:** http://localhost:8080/docs  
+- **Health:** http://localhost:8080/health ou http://localhost:7860/api/health  
+
+Imagens: `breno-yukio/frontend` e `breno-yukio/backend`.
+
+## Kubernetes
+
+- Backend: Service `backend-json`, porta **8080**
+- Frontend: Service `gradio-service`, porta **80** → `targetPort` **80**
+
+Se algo não subir, verifique `docker compose ps` e `docker compose logs`.
