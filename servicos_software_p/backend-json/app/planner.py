@@ -1,7 +1,3 @@
-"""
-Geração do plano de estudos: janelas horárias, compromissos, blocos e distribuição por matéria.
-"""
-
 from __future__ import annotations
 
 import re
@@ -19,7 +15,6 @@ from .models import (
     MateriaEntrada,
 )
 
-# Janelas do período preferido (minutos desde 00:00, intervalo [inicio, fim))
 JANELAS_MIN = {
     "manha": (8 * 60 + 0, 12 * 60 + 0),
     "tarde": (13 * 60 + 0, 18 * 60 + 0),
@@ -28,7 +23,6 @@ JANELAS_MIN = {
 
 PESO_DIFICULDADE = {"baixa": 1, "media": 2, "alta": 3}
 
-# Fração alvo de teoria (resto são exercícios/prática)
 FRACAO_TEORIA = {
     "prova": 0.40,
     "revisao": 0.30,
@@ -49,17 +43,12 @@ def _hhmm_para_minutos(hhmm: str) -> int:
 
 
 def _texto_busca_seguro(texto: str) -> str:
-    """Remove caracteres problemáticos para montar query de busca."""
     t = (texto or "").strip()[:120]
     t = re.sub(r"[\x00-\x1f<>\"]+", " ", t)
     return t.strip()
 
 
 def montar_dicas_exercicios(materias: list[MateriaEntrada]) -> list[DicaPorMateria]:
-    """
-    Monta sugestões de links (principalmente buscas) por matéria para achar exercícios.
-    Os destinos são sites públicos; o aluno filtra o que for útil.
-    """
     resultado: list[DicaPorMateria] = []
     for m in materias:
         nome = _texto_busca_seguro(m.nome)
@@ -89,7 +78,6 @@ def montar_dicas_exercicios(materias: list[MateriaEntrada]) -> list[DicaPorMater
 def _subtrair_intervalo(
     livres: list[tuple[int, int]], ocup_inicio: int, ocup_fim: int
 ) -> list[tuple[int, int]]:
-    """Remove [ocup_inicio, ocup_fim) de cada intervalo livre (meio-abertos [a,b))."""
     resultado: list[tuple[int, int]] = []
     for a, b in livres:
         if ocup_fim <= a or ocup_inicio >= b:
@@ -112,7 +100,6 @@ def _intervalos_livres_dia(
             continue
         ci = _hhmm_para_minutos(c.inicio)
         cf = _hhmm_para_minutos(c.fim)
-        # Só corta o que intersecta a janela de estudo
         livres = _subtrair_intervalo(livres, ci, cf)
     livres.sort()
     return livres
@@ -121,7 +108,6 @@ def _intervalos_livres_dia(
 def _alocar_minutos_por_peso(
     total_minutos: int, pesos: list[int]
 ) -> list[int]:
-    """Distribui `total_minutos` inteiros proporcionalmente a `pesos` (maior resto)."""
     soma = sum(pesos)
     if soma == 0:
         return [0] * len(pesos)
@@ -147,7 +133,6 @@ class EstadoMateria:
         self.rem_exercicios = self.min_exercicios
 
 
-# Ritmo tipo aula: duas aulas de 50 min, intervalos de 5 e 20 min (repete).
 CICLO_TIPO_AULA: list[tuple[int, Literal["estudo", "pausa"]]] = [
     (50, "estudo"),
     (5, "pausa"),
@@ -171,7 +156,6 @@ def _escolher_materia(ctx: ContextoGeracao) -> int | None:
         return None
     outros = [i for i in candidatos if i != ctx.last_idx]
     pool = outros if outros else candidatos
-    # Prioriza quem tem mais minutos restantes; alterna desempate com `alternancia`
     pool.sort(
         key=lambda i: (
             -(ctx.materias[i].rem_teoria + ctx.materias[i].rem_exercicios),
@@ -191,7 +175,6 @@ def _escolher_tipo(ctx: ContextoGeracao, mi: int) -> Literal["teoria", "exercici
     rem_t = m.rem_teoria
     rem_e = m.rem_exercicios
     proporcao_teoria_na_fila = rem_t / (rem_t + rem_e)
-    # Se a fila está mais "teórica" que o alvo, consumimos teoria; senão exercícios
     if proporcao_teoria_na_fila >= alvo:
         return "teoria"
     return "exercicios"
@@ -210,15 +193,8 @@ def _duracao_estudo_disponivel(
 
 
 def gerar_plano(req: GerarPlanoRequest) -> GerarPlanoResponse:
-    """
-    Monta o plano dia a dia respeitando janela, compromissos e quotas por matéria.
-
-    Ritmo fixo: blocos de 50 min (aula), 5 min entre uma matéria e outra, 20 min após
-    cada duas aulas (ciclo 50+5+50+20). O campo `pausas` na entrada é legado e não altera isso.
-    """
     observacoes: list[str] = []
 
-    # Orçamento total de estudo (teoria + exercícios), em minutos
     total_orcamento_estudo = int(round(req.dias_estudo * req.horas_por_dia * 60))
     if total_orcamento_estudo < 1:
         total_orcamento_estudo = 1
@@ -284,7 +260,6 @@ def gerar_plano(req: GerarPlanoRequest) -> GerarPlanoResponse:
                     fase_ciclo += 1
                     continue
 
-                # Bloco de estudo (aula)
                 if espaco < 15:
                     break
 
@@ -346,7 +321,6 @@ def gerar_plano(req: GerarPlanoRequest) -> GerarPlanoResponse:
         for d in range(1, req.dias_estudo + 1)
     ]
 
-    # Tempo total = soma das durações de todos os blocos gerados (inclui intervalos)
     tempo_total = 0
     for d in dias_saida:
         for b in d.blocos:

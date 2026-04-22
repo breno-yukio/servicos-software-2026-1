@@ -1,4 +1,3 @@
-# Planejador de rotina de estudos: frontend (Nginx) + backend FastAPI
 services:
   gradio-service:
     image: breno-yukio/frontend
@@ -6,7 +5,6 @@ services:
       context: gradio-json
       dockerfile: Dockerfile
     ports:
-      # Mesma porta externa do projeto original (Gradio); evita conflito comum com 3000
       - "7860:80"
     depends_on:
       - backend-json

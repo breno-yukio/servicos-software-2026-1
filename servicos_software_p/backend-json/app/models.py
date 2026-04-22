@@ -1,5 +1,3 @@
-"""Modelos Pydantic para entrada e saída da API."""
-
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -11,9 +9,7 @@ def _hhmm_to_minutes(hhmm: str) -> int:
 
 
 class CompromissoEntrada(BaseModel):
-    """Intervalo ocupado em um dia específico do plano (1 = primeiro dia)."""
-
-    dia: int = Field(ge=1, description="Dia do plano (1-indexado)")
+    dia: int = Field(ge=1)
     inicio: str = Field(pattern=r"^\d{2}:\d{2}$")
     fim: str = Field(pattern=r"^\d{2}:\d{2}$")
 
@@ -33,10 +29,7 @@ class GerarPlanoRequest(BaseModel):
     dias_estudo: int = Field(ge=1, le=365)
     horas_por_dia: float = Field(gt=0, le=24)
     objetivo: Literal["prova", "revisao", "trabalho", "aprendizado"]
-    pausas: Literal["curtas", "longas", "tipo_aula"] = Field(
-        default="tipo_aula",
-        description="Legado; o agendamento usa sempre pausas fixas (5 min entre aulas, 20 min a cada duas).",
-    )
+    pausas: Literal["curtas", "longas", "tipo_aula"] = Field(default="tipo_aula")
     periodo_preferido: Literal["manha", "tarde", "noite"]
     compromissos: list[CompromissoEntrada] = Field(default_factory=list)
     materias: list[MateriaEntrada] = Field(min_length=1)
@@ -44,7 +37,6 @@ class GerarPlanoRequest(BaseModel):
     @field_validator("pausas", mode="before")
     @classmethod
     def pausas_ou_default(cls, v: object) -> object:
-        """Aceita omissão, null ou string vazia (clientes antigos) e normaliza para tipo_aula."""
         if v is None or v == "":
             return "tipo_aula"
         return v
@@ -79,8 +71,6 @@ class DiaSaida(BaseModel):
 
 
 class LinkDica(BaseModel):
-    """Sugestão de link para o aluno buscar exercícios (URLs de pesquisa)."""
-
     titulo: str
     url: str
 
@@ -94,7 +84,4 @@ class GerarPlanoResponse(BaseModel):
     tempo_total_minutos: int
     dias: list[DiaSaida]
     observacoes: list[str]
-    dicas_exercicios: list[DicaPorMateria] = Field(
-        default_factory=list,
-        description="Sugestões de buscas por matéria para achar exercícios e material.",
-    )
+    dicas_exercicios: list[DicaPorMateria] = Field(default_factory=list)

@@ -1,7 +1,3 @@
-/**
- * Formulário dinâmico, integração com /api e edição local do plano gerado.
- */
-
 const API_BASE = "/api";
 
 const materiasList = document.getElementById("materias-list");
@@ -18,7 +14,6 @@ const editHint = document.getElementById("edit-hint");
 const resultToolbar = document.getElementById("result-toolbar");
 const listaMaterias = document.getElementById("lista-materias");
 
-/** Cópia profunda do último JSON retornado pela API (para restaurar). */
 let planoOriginal = null;
 
 function pad2(n) {
@@ -95,7 +90,6 @@ function collectPayload() {
     dias_estudo: Number(fd.get("dias_estudo")),
     horas_por_dia: Number(fd.get("horas_por_dia")),
     objetivo: fd.get("objetivo"),
-    /* Ritmo fixo no servidor; valor exigido pela API para validação. */
     pausas: "tipo_aula",
     periodo_preferido: fd.get("periodo_preferido"),
     compromissos,
@@ -153,14 +147,12 @@ function syncMatDisabled(li) {
   if (tipo === "pausa") inp.value = "";
 }
 
-/** Rótulo amigável para o tipo no texto de destaque. */
 function tipoLegivel(tipo) {
   if (tipo === "exercicios") return "exercícios";
   if (tipo === "teoria") return "teoria";
   return "pausa";
 }
 
-/** Linha principal: "HH:MM–HH:MM - Matéria (teoria|exercícios)" ou "HH:MM–HH:MM - Pausa". */
 function syncBlocoHeadline(li) {
   const horEl = li.querySelector(".bloco-headline__horario");
   const midEl = li.querySelector(".bloco-headline__mid");
@@ -199,10 +191,6 @@ function computeTotalsFromDOM() {
   if (pill) pill.textContent = `Tempo total (blocos): ${total} min`;
 }
 
-/**
- * @param {object} data resposta da API
- * @param {{ replaceOriginal?: boolean }} opts se false, não sobrescreve a cópia para restauração
- */
 function renderPlano(data, opts = {}) {
   const replaceOriginal = opts.replaceOriginal !== false;
   if (replaceOriginal) {
@@ -410,7 +398,6 @@ form.addEventListener("submit", async (ev) => {
         if (body.erro) msg = body.erro;
         if (body.detalhes) msg += `: ${body.detalhes.join(" | ")}`;
       } catch {
-        /* ignore */
       }
       throw new Error(msg);
     }
