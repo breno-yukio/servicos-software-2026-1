@@ -1,19 +1,19 @@
 services:
-  gradio-service:
+  frontend:
     image: breno-yukio/frontend
     build:
-      context: gradio-json
+      context: frontend
       dockerfile: Dockerfile
     ports:
       - "7860:80"
     depends_on:
-      - backend-json
+      - backend
     restart: unless-stopped
 
-  backend-json:
+  backend:
     image: breno-yukio/backend
     build:
-      context: backend-json
+      context: backend
       dockerfile: Dockerfile
     ports:
       - "8080:8080"

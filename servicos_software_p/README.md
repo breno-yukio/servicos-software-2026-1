@@ -1,13 +1,13 @@
 # Planejador de rotina de estudos
 
-Aplicação com **frontend** (Nginx + HTML/CSS/JS na pasta `gradio-json`) e **backend** (FastAPI na pasta `backend-json`), orquestrada com **Docker Compose** (`compose.yaml`), conforme o projeto final da disciplina.
+Aplicação com **frontend** (Nginx + HTML/CSS/JS na pasta `frontend`) e **backend** (FastAPI na pasta `backend`), orquestrada com **Docker Compose** (`compose.yaml`), conforme o projeto final da disciplina.
 
 ## Serviços (Compose)
 
 | Serviço Compose | Pasta | Função |
 |-----------------|-------|--------|
-| `gradio-service` | `gradio-json/` | Página estática + proxy `/api` → backend |
-| `backend-json` | `backend-json/` | API REST (`/gerar-plano`, `/health`, `/docs`) |
+| `frontend` | `frontend/` | Página estática + proxy `/api` → backend |
+| `backend` | `backend/` | API REST (`/gerar-plano`, `/health`, `/docs`) |
 
 ## Subir localmente
 
