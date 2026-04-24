@@ -2,7 +2,7 @@
 
 ## Visão do Projeto
 
-Este projeto consiste em criar um frontend e backendem em containers Docker, que permite a geração automática de uma rotina de estudos personalizada.
+Este projeto consiste em criar um frontend e backend em containers Docker, que permite a geração automática de uma rotina de estudos personalizada.
 
 A aplicação segue o modelo de arquitetura cliente-servidor com API REST, onde o frontend coleta as informações do usuário e envia para o backend, responsável por processar os dados e retornar um plano de estudos estruturado.
 
