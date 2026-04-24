@@ -2,9 +2,9 @@
 
 ## Visão do Projeto
 
-Este projeto consiste em uma aplicação distribuída baseada em **frontend e backend em containers Docker**, que permite a geração automática de uma rotina de estudos personalizada.
+Este projeto consiste em criar um frontend e backendem em containers Docker, que permite a geração automática de uma rotina de estudos personalizada.
 
-A aplicação segue o modelo de arquitetura **cliente-servidor com API REST**, onde o frontend coleta as informações do usuário e envia para o backend, responsável por processar os dados e retornar um plano de estudos estruturado.
+A aplicação segue o modelo de arquitetura cliente-servidor com API REST, onde o frontend coleta as informações do usuário e envia para o backend, responsável por processar os dados e retornar um plano de estudos estruturado.
 
 ---
 
@@ -14,7 +14,7 @@ O sistema é composto por dois serviços principais:
 
 * **Frontend:** Interface web responsável pela interação com o usuário
 * **Backend:** API REST responsável pelo processamento e geração da rotina
-* **Modelo:** Algoritmo baseado em regras 
+* **Modelo:** Algoritmo baseado em regras de negócio
 
 A comunicação entre frontend e backend ocorre via **HTTP (API REST)**.
 
@@ -32,10 +32,10 @@ A comunicação entre frontend e backend ocorre via **HTTP (API REST)**.
    * período preferido (manhã, tarde ou noite)
    * horários já comprometidos
 
-1) O frontend envia os dados para o backend via requisição HTTP (POST)
-2) O backend processa as informações utilizando regras de negócio
-3) Um plano de estudos é gerado e retornado em formato JSON
-4) O frontend exibe a rotina organizada por dia
+3. O frontend envia os dados para o backend via requisição HTTP (POST)
+4. O backend processa as informações utilizando regras de negócio
+5. Um plano de estudos é gerado e retornado em formato JSON
+6. O frontend exibe a rotina organizada por dia
 
 ---
 
@@ -68,13 +68,13 @@ Matérias com maior dificuldade recebem mais tempo de estudo.
 Depende do objetivo do usuário:
 
 * Prova → foco em exercícios
-* Revisão → prática intensiva
+* Revisão → foco em exercício mas com teoria também
 * Aprendizado → foco em teoria
 * Trabalho → equilíbrio entre teoria e prática
 
 ---
 
-### Período de estudo
+### Períodos de estudo
 
 * Manhã → 08:00 às 12:00
 * Tarde → 13:00 às 18:00
@@ -89,16 +89,3 @@ Depende do objetivo do usuário:
 * Alterna conteúdos para evitar repetição excessiva
 
 ---
-
-## Como Executar o Projeto
-
-Na pasta do projeto, execute:
-
-```bash
-docker compose up --build
-```
-
-Após a execução:
-
-* Frontend: http://localhost:3000
-* Backend: http://localhost:8000
