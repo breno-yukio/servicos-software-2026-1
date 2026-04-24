@@ -53,7 +53,7 @@ A comunicação entre frontend e backend ocorre via **HTTP (API REST)**.
 
 O backend implementa um modelo próprio baseado em regras para gerar a rotina:
 
-### 📊 Distribuição por dificuldade
+### Distribuição por dificuldade
 
 * Baixa → peso 1
 * Média → peso 2
